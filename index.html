@@ -7,7 +7,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- 添加网站图标 -->
     <link rel="icon" href="https://youke1.picui.cn/s1/2025/10/06/68e2f8cb8bf22.jpeg" type="image/jpeg">
     <style>
         :root {
@@ -36,6 +35,34 @@
             font-family: 'Noto Sans SC', sans-serif;
             position: relative;
             overflow-x: hidden;
+            transition: all 0.5s ease;
+        }
+        
+        /* 12月13日黑白效果 */
+        body.memorial-day {
+            filter: grayscale(100%);
+            background: linear-gradient(rgba(30, 30, 30, 0.8), rgba(50, 50, 50, 0.9)), 
+                        url('https://api.btstu.cn/sjbz/api.php?lx=fengjing&format=images') no-repeat center center fixed;
+            background-size: cover;
+        }
+        
+        body.memorial-day .header h1 {
+            background: linear-gradient(45deg, #888, #aaa, #ccc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        body.memorial-day .section-title {
+            color: #aaa;
+        }
+        
+        body.memorial-day .card-panel {
+            background: rgba(40, 40, 40, 0.8);
+        }
+        
+        body.memorial-day .social-btn,
+        body.memorial-day .wechat-btn {
+            background: #555;
         }
         
         /* 顶部信息栏样式 */
@@ -142,7 +169,7 @@
             letter-spacing: 1px;
         }
         
-        /* 生日蛋糕样式 */
+        /* 修复生日蛋糕样式 */
         .birthday-cake {
             position: absolute;
             top: -10px;
@@ -150,11 +177,44 @@
             font-size: 2.5rem;
             color: #ff8ed4;
             animation: bounce 2s infinite;
+            text-shadow: 0 0 10px rgba(255, 142, 212, 0.7);
+            z-index: 10;
+        }
+        
+        /* 纪念日蜡烛样式 */
+        .memorial-candle {
+            position: absolute;
+            top: -10px;
+            left: -50px;
+            font-size: 2.5rem;
+            color: white;
+            animation: flicker 3s infinite alternate;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+            z-index: 10;
         }
         
         @keyframes bounce {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes flicker {
+            0%, 100% { 
+                opacity: 0.8;
+                transform: scale(1);
+            }
+            25% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+            50% {
+                opacity: 0.7;
+                transform: scale(0.95);
+            }
+            75% {
+                opacity: 0.9;
+                transform: scale(1.03);
+            }
         }
         
         /* 搜索区域 */
@@ -912,6 +972,28 @@
             white-space: pre-line;
         }
         
+        /* 纪念日飘落效果 */
+        .falling-flower {
+            position: fixed;
+            top: -50px;
+            font-size: 20px;
+            color: white;
+            opacity: 0.7;
+            z-index: 9999;
+            pointer-events: none;
+        }
+        
+        /* 生日飘落效果 */
+        .falling-heart {
+            position: fixed;
+            top: -50px;
+            font-size: 20px;
+            color: #ff8ed4;
+            opacity: 0.7;
+            z-index: 9999;
+            pointer-events: none;
+        }
+        
         @media (min-width: 992px) {
             .video-links {
                 grid-template-columns: 1fr 1fr;
@@ -1029,6 +1111,18 @@
             .wechat-popover {
                 width: 160px;
             }
+            
+            .birthday-cake, .memorial-candle {
+                font-size: 2rem;
+            }
+            
+            .birthday-cake {
+                right: -30px;
+            }
+            
+            .memorial-candle {
+                left: -30px;
+            }
         }
     </style>
 </head>
@@ -1065,6 +1159,10 @@
                 <!-- 生日蛋糕彩蛋，仅在11月16日显示 -->
                 <span class="birthday-cake" id="birthdayCake" style="display: none;">
                     <i class="fas fa-birthday-cake"></i>
+                </span>
+                <!-- 纪念日蜡烛，仅在12月13日显示 -->
+                <span class="memorial-candle" id="memorialCandle" style="display: none;">
+                    <i class="fas fa-candle-holder"></i>
                 </span>
             </h1>
             <p>视觉创作 · 影像艺术 · 精彩瞬间</p>
@@ -1609,6 +1707,27 @@
             // 检查是否是11月16日，如果是则显示生日蛋糕
             const isBirthday = (month === '11' && day === '16');
             document.getElementById('birthdayCake').style.display = isBirthday ? 'inline' : 'none';
+            
+            // 检查是否是12月13日，如果是则显示纪念日效果
+            const isMemorialDay = (month === '12' && day === '13');
+            
+            if (isMemorialDay) {
+                document.body.classList.add('memorial-day');
+                document.getElementById('memorialCandle').style.display = 'inline';
+                createFallingFlowers();
+            } else {
+                document.body.classList.remove('memorial-day');
+                document.getElementById('memorialCandle').style.display = 'none';
+            }
+            
+            // 如果今天是生日，添加一些庆祝效果
+            if (isBirthday) {
+                document.body.style.background = "linear-gradient(rgba(255, 105, 180, 0.3), rgba(255, 20, 147, 0.4)), " + 
+                                                "url('https://api.btstu.cn/sjbz/api.php?lx=fengjing&format=images') no-repeat center center fixed";
+                
+                // 添加一些飘落效果
+                createFallingHearts();
+            }
         }
 
         // 天气功能 - 使用心知天气API
@@ -1673,6 +1792,124 @@
                     </div>
                 `;
             }
+        }
+
+        // 创建飘落的心形效果（仅在生日时显示）
+        function createFallingHearts() {
+            const heartContainer = document.createElement('div');
+            heartContainer.style.position = 'fixed';
+            heartContainer.style.top = '0';
+            heartContainer.style.left = '0';
+            heartContainer.style.width = '100%';
+            heartContainer.style.height = '100%';
+            heartContainer.style.pointerEvents = 'none';
+            heartContainer.style.zIndex = '9999';
+            document.body.appendChild(heartContainer);
+            
+            // 创建多个心形
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => {
+                    createHeart(heartContainer);
+                }, i * 300);
+            }
+            
+            // 持续添加心形
+            setInterval(() => {
+                createHeart(heartContainer);
+            }, 1500);
+        }
+        
+        function createHeart(container) {
+            const heart = document.createElement('div');
+            heart.className = 'falling-heart';
+            heart.innerHTML = '❤️';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.fontSize = Math.random() * 20 + 15 + 'px';
+            heart.style.animation = `fall-heart ${Math.random() * 3 + 5}s linear forwards`;
+            
+            // 添加动画
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fall-heart {
+                    0% {
+                        transform: translateY(-50px) rotate(0deg);
+                        opacity: 0.8;
+                    }
+                    100% {
+                        transform: translateY(105vh) rotate(${Math.random() * 360}deg);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            container.appendChild(heart);
+            
+            // 移除心形元素
+            setTimeout(() => {
+                if (heart.parentNode) {
+                    heart.parentNode.removeChild(heart);
+                }
+            }, 8000);
+        }
+        
+        // 创建飘落的花朵效果（仅在纪念日时显示）
+        function createFallingFlowers() {
+            const flowerContainer = document.createElement('div');
+            flowerContainer.style.position = 'fixed';
+            flowerContainer.style.top = '0';
+            flowerContainer.style.left = '0';
+            flowerContainer.style.width = '100%';
+            flowerContainer.style.height = '100%';
+            flowerContainer.style.pointerEvents = 'none';
+            flowerContainer.style.zIndex = '9999';
+            document.body.appendChild(flowerContainer);
+            
+            // 创建多个花朵
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    createFlower(flowerContainer);
+                }, i * 500);
+            }
+            
+            // 持续添加花朵
+            setInterval(() => {
+                createFlower(flowerContainer);
+            }, 2000);
+        }
+        
+        function createFlower(container) {
+            const flower = document.createElement('div');
+            flower.className = 'falling-flower';
+            flower.innerHTML = '❀';
+            flower.style.left = Math.random() * 100 + 'vw';
+            flower.style.fontSize = Math.random() * 15 + 10 + 'px';
+            flower.style.animation = `fall-flower ${Math.random() * 5 + 8}s linear forwards`;
+            
+            // 添加动画
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fall-flower {
+                    0% {
+                        transform: translateY(-50px) rotate(0deg);
+                        opacity: 0.8;
+                    }
+                    100% {
+                        transform: translateY(105vh) rotate(${Math.random() * 360}deg);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            container.appendChild(flower);
+            
+            // 移除花朵元素
+            setTimeout(() => {
+                if (flower.parentNode) {
+                    flower.parentNode.removeChild(flower);
+                }
+            }, 10000);
         }
 
         // 微信按钮功能
