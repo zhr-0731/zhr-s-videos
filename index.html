@@ -7,6 +7,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- 添加网站图标 -->
+    <link rel="icon" href="https://youke1.picui.cn/s1/2025/10/06/68e2f8cb8bf22.jpeg" type="image/jpeg">
     <style>
         :root {
             --bilibili-blue: #00a1d6;
@@ -33,29 +35,6 @@
             font-family: 'Noto Sans SC', sans-serif;
             position: relative;
             overflow-x: hidden;
-        }
-        
-        .github-banner {
-            position: absolute;
-            top: 0;
-            right: 0;
-            background: rgba(0,0,0,0.7);
-            padding: 10px 20px;
-            border-bottom-left-radius: 20px;
-            z-index: 1000;
-            font-size: 0.9rem;
-        }
-        
-        .github-banner a {
-            color: #6a5af9;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-        }
-        
-        .github-banner i {
-            margin-right: 8px;
-            font-size: 1.2rem;
         }
         
         .header {
@@ -316,6 +295,41 @@
             margin-bottom: 10px;
             font-size: 1.3rem;
             color: #6a5af9;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .platform-icons {
+            display: flex;
+            gap: 8px;
+            margin-left: 5px;
+        }
+        
+        .platform-icon {
+            font-size: 1.2rem;
+            transition: transform 0.3s;
+        }
+        
+        .platform-icon:hover {
+            transform: scale(1.2);
+        }
+        
+        .bilibili-icon {
+            color: var(--bilibili-blue);
+        }
+        
+        .douyin-icon {
+            color: #69c9d0;
+        }
+        
+        .weibo-icon {
+            color: var(--weibo-red);
+        }
+        
+        .wechat-icon {
+            color: #07c160;
         }
         
         .video-info p {
@@ -466,28 +480,6 @@
             border-top: 1px solid rgba(255,255,255,0.1);
         }
         
-        .stars {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: -1;
-        }
-        
-        .star {
-            position: absolute;
-            background: #fff;
-            border-radius: 50%;
-            animation: twinkle var(--duration, 3s) infinite ease-in-out;
-        }
-        
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.2; }
-            50% { opacity: 1; }
-        }
-        
         /* 高亮搜索匹配 */
         .highlight {
             background-color: var(--search-highlight);
@@ -524,19 +516,25 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
         
-        /* 播放器模态框样式 */
+        /* 播放器模态框样式 - 毛玻璃效果增强 */
         .player-modal .modal-content {
-            background: rgba(30, 30, 50, 0.85);
-            backdrop-filter: blur(15px);
+            background: rgba(30, 30, 50, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255,255,255,0.2);
             border-radius: 20px;
             color: white;
             min-height: 70vh;
+            max-height: 85vh;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
         }
         
         .player-modal .modal-header {
             border-bottom: 1px solid rgba(255,255,255,0.1);
             padding: 20px 25px;
+            background: rgba(40, 40, 60, 0.5);
+            backdrop-filter: blur(10px);
         }
         
         .player-modal .modal-title {
@@ -557,7 +555,7 @@
         .player-modal .modal-body {
             padding: 0;
             display: flex;
-            height: 60vh;
+            height: calc(85vh - 80px);
         }
         
         /* 播放列表样式 */
@@ -566,6 +564,8 @@
             border-right: 1px solid rgba(255,255,255,0.1);
             overflow-y: auto;
             padding: 20px;
+            background: rgba(30, 30, 50, 0.5);
+            backdrop-filter: blur(10px);
         }
         
         .playlist-item {
@@ -578,6 +578,7 @@
             cursor: pointer;
             transition: all 0.3s;
             border: 1px solid rgba(255,255,255,0.05);
+            backdrop-filter: blur(5px);
         }
         
         .playlist-item:hover {
@@ -609,6 +610,20 @@
             font-size: 1rem;
             font-weight: 500;
             color: #fff;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        
+        .playlist-platform-icons {
+            display: flex;
+            gap: 5px;
+            margin-left: 8px;
+        }
+        
+        .playlist-platform-icon {
+            font-size: 0.9rem;
         }
         
         /* 播放器样式 */
@@ -617,9 +632,11 @@
             padding: 20px;
             display: flex;
             flex-direction: column;
+            background: rgba(30, 30, 50, 0.5);
+            backdrop-filter: blur(10px);
         }
         
-        .bilibili-player-container {
+        .video-player-container {
             width: 100%;
             height: 0;
             padding-bottom: 56.25%; /* 16:9 比例 */
@@ -630,7 +647,7 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.4);
         }
         
-        .bilibili-player-container iframe {
+        .video-player-container iframe {
             position: absolute;
             top: 0;
             left: 0;
@@ -644,18 +661,35 @@
             border-radius: 12px;
             padding: 15px;
             border: 1px solid rgba(255,255,255,0.05);
+            margin-top: auto;
+            backdrop-filter: blur(5px);
         }
         
         .player-info h4 {
             font-size: 1.2rem;
             color: #6a5af9;
             margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .player-platform-icons {
+            display: flex;
+            gap: 6px;
+            margin-left: 5px;
+        }
+        
+        .player-platform-icon {
+            font-size: 1.1rem;
         }
         
         .player-info p {
             color: #ccc;
             font-size: 0.95rem;
             margin: 0;
+            white-space: pre-line;
         }
         
         @media (min-width: 992px) {
@@ -745,20 +779,18 @@
                 height: 50px;
                 margin-right: 12px;
             }
+            
+            .platform-icons, .playlist-platform-icons, .player-platform-icons {
+                gap: 4px;
+            }
+            
+            .platform-icon, .playlist-platform-icon, .player-platform-icon {
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- GitHub部署提示 -->
-    <div class="github-banner">
-        <a href="https://zhr-0731.github.io/zhr-s-videos/" target="_blank">
-            <i class="fab fa-github"></i> GitHub Pages 部署
-        </a>
-    </div>
-    
-    <!-- 动态星空背景 -->
-    <div class="stars" id="stars"></div>
-    
     <!-- 播放器按钮 -->
     <button class="player-button" data-bs-toggle="modal" data-bs-target="#playerModal" id="launchPlayerBtn">
         <i class="fas fa-play-circle"></i> 播放视频
@@ -766,6 +798,7 @@
     
     <div class="container">
         <div class="header">
+            <img src="https://youke1.picui.cn/s1/2025/10/06/68e2f8cb8bf22.jpeg" alt="网站图标" style="width: 80px; height: 80px; border-radius: 50%; margin-bottom: 20px;">
             <h1>张皓然的作品</h1>
             <p>视觉创作 · 影像艺术 · 精彩瞬间</p>
         </div>
@@ -777,7 +810,7 @@
                 <button id="searchButton"><i class="fas fa-search"></i> 搜索</button>
             </div>
             <div class="search-results">
-                找到 <span id="resultsCount">5</span> 个视频
+                找到 <span id="resultsCount">6</span> 个视频
             </div>
         </div>
         
@@ -795,6 +828,7 @@
                         <button type="button" data-bs-target="#videoCarousel" data-bs-slide-to="2"></button>
                         <button type="button" data-bs-target="#videoCarousel" data-bs-slide-to="3"></button>
                         <button type="button" data-bs-target="#videoCarousel" data-bs-slide-to="4"></button>
+                        <button type="button" data-bs-target="#videoCarousel" data-bs-slide-to="5"></button>
                     </div>
                     
                     <div class="carousel-inner">
@@ -857,6 +891,18 @@
                                 <h5>#重庆#李子坝</h5>
                             </div>
                         </div>
+                        
+                        <!-- 视频6：抖音视频 - 过年烟花 -->
+                        <div class="carousel-item">
+                            <a href="https://www.douyin.com/user/MS4wLjABAAAAOYg4GYkFW37Rg62PW4qcqfLgBWPmUezFEoG9y-j-sHY?from_tab_name=main&modal_id=7464933139094293810" target="_blank">
+                                <img src="https://youke1.picui.cn/s1/2025/10/06/68e2fe2a84275.png" 
+                                     class="d-block w-100" 
+                                     alt="#过年#烟花 视频封面">
+                            </a>
+                            <div class="carousel-caption">
+                                <h5>#过年 #烟花</h5>
+                            </div>
+                        </div>
                     </div>
                     
                     <button class="carousel-control-prev" type="button" data-bs-target="#videoCarousel" data-bs-slide="prev">
@@ -889,7 +935,14 @@
                             </div>
                         </div>
                         <div class="video-info">
-                            <h4>#张家界#永定区</h4>
+                            <h4>#张家界#永定区
+                                <div class="platform-icons">
+                                    <i class="fab fa-bilibili platform-icon bilibili-icon" title="B站"></i>
+                                    <i class="fab fa-tiktok platform-icon douyin-icon" title="抖音"></i>
+                                    <i class="fab fa-weibo platform-icon weibo-icon" title="微博"></i>
+                                    <i class="fab fa-weixin platform-icon wechat-icon" title="微信视频号"></i>
+                                </div>
+                            </h4>
                             <p>探索张家界永定区的自然奇观与人文风情</p>
                             <a href="https://www.bilibili.com/video/BV1bb3izbEDk/?spm_id_from=333.1387.homepage.video_card.click" target="_blank">
                                 观看视频
@@ -906,7 +959,14 @@
                             </div>
                         </div>
                         <div class="video-info">
-                            <h4>#重庆#长江索道</h4>
+                            <h4>#重庆#长江索道
+                                <div class="platform-icons">
+                                    <i class="fab fa-bilibili platform-icon bilibili-icon" title="B站"></i>
+                                    <i class="fab fa-tiktok platform-icon douyin-icon" title="抖音"></i>
+                                    <i class="fab fa-weibo platform-icon weibo-icon" title="微博"></i>
+                                    <i class="fab fa-weixin platform-icon wechat-icon" title="微信视频号"></i>
+                                </div>
+                            </h4>
                             <p>体验重庆特色交通，俯瞰长江两岸风光</p>
                             <a href="https://www.bilibili.com/video/BV1dc3Ez9EqF/?spm_id_from=333.1387.homepage.video_card.click" target="_blank">
                                 观看视频
@@ -923,7 +983,13 @@
                             </div>
                         </div>
                         <div class="video-info">
-                            <h4>#日落#张家界</h4>
+                            <h4>#日落#张家界
+                                <div class="platform-icons">
+                                    <i class="fab fa-bilibili platform-icon bilibili-icon" title="B站"></i>
+                                    <i class="fab fa-tiktok platform-icon douyin-icon" title="抖音"></i>
+                                    <i class="fab fa-weixin platform-icon wechat-icon" title="微信视频号"></i>
+                                </div>
+                            </h4>
                             <p>张家界绝美日落，感受大自然的壮丽与宁静</p>
                             <a href="https://www.bilibili.com/video/BV16j3JzYEjG/?spm_id_from=333.1387.homepage.video_card.click" target="_blank">
                                 观看视频
@@ -941,7 +1007,14 @@
                             </div>
                         </div>
                         <div class="video-info">
-                            <h4>#李子坝#重庆</h4>
+                            <h4>#李子坝#重庆
+                                <div class="platform-icons">
+                                    <i class="fab fa-bilibili platform-icon bilibili-icon" title="B站"></i>
+                                    <i class="fab fa-tiktok platform-icon douyin-icon" title="抖音"></i>
+                                    <i class="fab fa-weibo platform-icon weibo-icon" title="微博"></i>
+                                    <i class="fab fa-weixin platform-icon wechat-icon" title="微信视频号"></i>
+                                </div>
+                            </h4>
                             <p>穿越居民楼的轻轨，重庆特色交通景观</p>
                             <a href="https://www.bilibili.com/video/BV1MB37z6EcT/?spm_id_from=333.1387.homepage.video_card.click" target="_blank">
                                 观看视频
@@ -958,9 +1031,38 @@
                             </div>
                         </div>
                         <div class="video-info">
-                            <h4>#重庆#李子坝</h4>
+                            <h4>#重庆#李子坝
+                                <div class="platform-icons">
+                                    <i class="fab fa-bilibili platform-icon bilibili-icon" title="B站"></i>
+                                    <i class="fab fa-tiktok platform-icon douyin-icon" title="抖音"></i>
+                                    <i class="fab fa-weixin platform-icon wechat-icon" title="微信视频号"></i>
+                                </div>
+                            </h4>
                             <p>山城独特风景，李子坝轻轨穿楼奇观</p>
                             <a href="https://www.bilibili.com/video/BV1tq37z3Et7/?spm_id_from=333.1387.homepage.video_card.click" target="_blank">
+                                观看视频
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- 新增抖音视频 -->
+                    <div class="video-link" data-title="过年烟花" data-desc="红绸裹着糖瓜粘住旧时光 春联未干，墨香在阶前流淌">
+                        <div class="video-thumbnail">
+                            <img src="https://youke1.picui.cn/s1/2025/10/06/68e2fe2a84275.png" 
+                                 alt="#过年#烟花 视频封面">
+                            <div class="play-icon">
+                                <i class="fas fa-play-circle"></i>
+                            </div>
+                        </div>
+                        <div class="video-info">
+                            <h4>#过年 #烟花
+                                <div class="platform-icons">
+                                    <i class="fab fa-tiktok platform-icon douyin-icon" title="抖音"></i>
+                                    <i class="fab fa-weixin platform-icon wechat-icon" title="微信视频号"></i>
+                                </div>
+                            </h4>
+                            <p>红绸裹着糖瓜粘住旧时光 春联未干，墨香在阶前流淌</p>
+                            <a href="https://www.douyin.com/user/MS4wLjABAAAAOYg4GYkFW37Rg62PW4qcqfLgBWPmUezFEoG9y-j-sHY?from_tab_name=main&modal_id=7464933139094293810" target="_blank">
                                 观看视频
                             </a>
                         </div>
@@ -999,8 +1101,8 @@
                     </h3>
                     <div class="about-content">
                         <p>
-                            张皓然，视觉创作者，专注于自然风光与人文纪实摄影。<br>
-                            用镜头捕捉世界的美好瞬间，分享独特的视觉体验。
+                            业余爱好者，不善于做视频，<br>
+                            仅为记录生活中的灵感而创作。
                         </p>
                         <div class="about-icons">
                             <div style="color: #6a5af9;">
@@ -1038,39 +1140,90 @@
                             <div class="playlist-thumbnail">
                                 <img src="https://youke1.picui.cn/s1/2025/10/05/68e2798edac66.jpeg" alt="#张家界#永定区">
                             </div>
-                            <div class="playlist-title">#张家界#永定区</div>
+                            <div class="playlist-title">#张家界#永定区
+                                <div class="playlist-platform-icons">
+                                    <i class="fab fa-bilibili playlist-platform-icon bilibili-icon" title="B站"></i>
+                                    <i class="fab fa-tiktok playlist-platform-icon douyin-icon" title="抖音"></i>
+                                    <i class="fab fa-weibo playlist-platform-icon weibo-icon" title="微博"></i>
+                                    <i class="fab fa-weixin playlist-platform-icon wechat-icon" title="微信视频号"></i>
+                                </div>
+                            </div>
                         </div>
                         <div class="playlist-item" data-video-id="1">
                             <div class="playlist-thumbnail">
                                 <img src="https://youke1.picui.cn/s1/2025/10/05/68e2798e4ce1c.jpeg" alt="#日落#张家界">
                             </div>
-                            <div class="playlist-title">#日落#张家界</div>
+                            <div class="playlist-title">#日落#张家界
+                                <div class="playlist-platform-icons">
+                                    <i class="fab fa-bilibili playlist-platform-icon bilibili-icon" title="B站"></i>
+                                    <i class="fab fa-tiktok playlist-platform-icon douyin-icon" title="抖音"></i>
+                                    <i class="fab fa-weixin playlist-platform-icon wechat-icon" title="微信视频号"></i>
+                                </div>
+                            </div>
                         </div>
                         <div class="playlist-item" data-video-id="2">
                             <div class="playlist-thumbnail">
                                 <img src="https://youke1.picui.cn/s1/2025/10/05/68e2798df3481.jpeg" alt="#重庆#李子坝">
                             </div>
-                            <div class="playlist-title">#重庆#李子坝</div>
+                            <div class="playlist-title">#重庆#李子坝
+                                <div class="playlist-platform-icons">
+                                    <i class="fab fa-bilibili playlist-platform-icon bilibili-icon" title="B站"></i>
+                                    <i class="fab fa-tiktok playlist-platform-icon douyin-icon" title="抖音"></i>
+                                    <i class="fab fa-weixin playlist-platform-icon wechat-icon" title="微信视频号"></i>
+                                </div>
+                            </div>
                         </div>
                         <div class="playlist-item" data-video-id="3">
                             <div class="playlist-thumbnail">
                                 <img src="https://youke1.picui.cn/s1/2025/10/05/68e2798dcd900.jpeg" alt="#重庆#长江索道">
                             </div>
-                            <div class="playlist-title">#重庆#长江索道</div>
+                            <div class="playlist-title">#重庆#长江索道
+                                <div class="playlist-platform-icons">
+                                    <i class="fab fa-bilibili playlist-platform-icon bilibili-icon" title="B站"></i>
+                                    <i class="fab fa-tiktok playlist-platform-icon douyin-icon" title="抖音"></i>
+                                    <i class="fab fa-weibo playlist-platform-icon weibo-icon" title="微博"></i>
+                                    <i class="fab fa-weixin playlist-platform-icon wechat-icon" title="微信视频号"></i>
+                                </div>
+                            </div>
                         </div>
                         <div class="playlist-item" data-video-id="4">
                             <div class="playlist-thumbnail">
                                 <img src="https://youke1.picui.cn/s1/2025/10/05/68e2798d9c524.jpeg" alt="#李子坝#重庆">
                             </div>
-                            <div class="playlist-title">#李子坝#重庆</div>
+                            <div class="playlist-title">#李子坝#重庆
+                                <div class="playlist-platform-icons">
+                                    <i class="fab fa-bilibili playlist-platform-icon bilibili-icon" title="B站"></i>
+                                    <i class="fab fa-tiktok playlist-platform-icon douyin-icon" title="抖音"></i>
+                                    <i class="fab fa-weibo playlist-platform-icon weibo-icon" title="微博"></i>
+                                    <i class="fab fa-weixin playlist-platform-icon wechat-icon" title="微信视频号"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="playlist-item" data-video-id="5">
+                            <div class="playlist-thumbnail">
+                                <img src="https://youke1.picui.cn/s1/2025/10/06/68e2fe2a84275.png" alt="#过年#烟花">
+                            </div>
+                            <div class="playlist-title">#过年 #烟花
+                                <div class="playlist-platform-icons">
+                                    <i class="fab fa-tiktok playlist-platform-icon douyin-icon" title="抖音"></i>
+                                    <i class="fab fa-weixin playlist-platform-icon wechat-icon" title="微信视频号"></i>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="player-container">
-                        <div class="bilibili-player-container">
-                            <iframe id="bilibiliPlayer" src="about:blank" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
+                        <div class="video-player-container">
+                            <iframe id="videoPlayer" src="about:blank" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
                         </div>
                         <div class="player-info">
-                            <h4 id="currentVideoTitle">#张家界#永定区</h4>
+                            <h4 id="currentVideoTitle">#张家界#永定区
+                                <div class="player-platform-icons">
+                                    <i class="fab fa-bilibili player-platform-icon bilibili-icon" title="B站"></i>
+                                    <i class="fab fa-tiktok player-platform-icon douyin-icon" title="抖音"></i>
+                                    <i class="fab fa-weibo player-platform-icon weibo-icon" title="微博"></i>
+                                    <i class="fab fa-weixin player-platform-icon wechat-icon" title="微信视频号"></i>
+                                </div>
+                            </h4>
                             <p id="currentVideoDesc">探索张家界永定区的自然奇观与人文风情</p>
                         </div>
                     </div>
@@ -1088,67 +1241,72 @@
                 title: "#张家界#永定区",
                 description: "探索张家界永定区的自然奇观与人文风情",
                 thumbnail: "https://youke1.picui.cn/s1/2025/10/05/68e2798edac66.jpeg",
-                embedUrl: "//player.bilibili.com/player.html?isOutside=true&aid=114805885113128&bvid=BV1bb3izbEDk&cid=30884037951&p=1"
+                embedUrl: "//player.bilibili.com/player.html?isOutside=true&aid=114805885113128&bvid=BV1bb3izbEDk&cid=30884037951&p=1",
+                platforms: ["bilibili", "douyin", "weibo", "wechat"],
+                type: "bilibili"
             },
             {
                 id: 1,
                 title: "#日落#张家界",
                 description: "张家界绝美日落，感受大自然的壮丽与宁静",
                 thumbnail: "https://youke1.picui.cn/s1/2025/10/05/68e2798e4ce1c.jpeg",
-                embedUrl: "//player.bilibili.com/player.html?isOutside=true&aid=114795114206739&bvid=BV16j3JzYEjG&cid=30851466951&p=1"
+                embedUrl: "//player.bilibili.com/player.html?isOutside=true&aid=114795114206739&bvid=BV16j3JzYEjG&cid=30851466951&p=1",
+                platforms: ["bilibili", "douyin", "wechat"],
+                type: "bilibili"
             },
             {
                 id: 2,
                 title: "#重庆#李子坝",
                 description: "山城独特风景，李子坝轻轨穿楼奇观",
                 thumbnail: "https://youke1.picui.cn/s1/2025/10/05/68e2798df3481.jpeg",
-                embedUrl: "//player.bilibili.com/player.html?isOutside=true&aid=114794057242760&bvid=BV1tq37z3Et7&cid=30846421094&p=1"
+                embedUrl: "//player.bilibili.com/player.html?isOutside=true&aid=114794057242760&bvid=BV1tq37z3Et7&cid=30846421094&p=1",
+                platforms: ["bilibili", "douyin", "wechat"],
+                type: "bilibili"
             },
             {
                 id: 3,
                 title: "#重庆#长江索道",
                 description: "体验重庆特色交通，俯瞰长江两岸风光",
                 thumbnail: "https://youke1.picui.cn/s1/2025/10/05/68e2798dcd900.jpeg",
-                embedUrl: "//player.bilibili.com/player.html?isOutside=true&aid=114793788741931&bvid=BV1dc3Ez9EqF&cid=30845043977&p=1"
+                embedUrl: "//player.bilibili.com/player.html?isOutside=true&aid=114793788741931&bvid=BV1dc3Ez9EqF&cid=30845043977&p=1",
+                platforms: ["bilibili", "douyin", "weibo", "wechat"],
+                type: "bilibili"
             },
             {
                 id: 4,
                 title: "#李子坝#重庆",
                 description: "穿越居民楼的轻轨，重庆特色交通景观",
                 thumbnail: "https://youke1.picui.cn/s1/2025/10/05/68e2798d9c524.jpeg",
-                embedUrl: "//player.bilibili.com/player.html?isOutside=true&aid=114794040398578&bvid=BV1MB37z6EcT&cid=30846289444&p=1"
+                embedUrl: "//player.bilibili.com/player.html?isOutside=true&aid=114794040398578&bvid=BV1MB37z6EcT&cid=30846289444&p=1",
+                platforms: ["bilibili", "douyin", "weibo", "wechat"],
+                type: "bilibili"
+            },
+            {
+                id: 5,
+                title: "#过年 #烟花",
+                description: `红绸裹着糖瓜粘住旧时光
+春联未干，墨香在阶前流淌
+母亲将月牙包进面皮褶皱
+孩子在廊下试穿新袄
+口袋揣满童话形状的爆仗
+
+直到子时绣球抛向天际
+碎金便簌簌落满青瓦
+有人指认：那是七仙女遗落的银梭
+将夜幕织成黎明的锦缎
+
+此刻所有的门扉都在发光
+雪地上脚印与车辙重叠成
+一朵朵通向春天的
+湿润的莲`,
+                thumbnail: "https://youke1.picui.cn/s1/2025/10/06/68e2fe2a84275.png",
+                embedUrl: "https://open.douyin.com/player/video?vid=7464933139094293810&autoplay=0",
+                platforms: ["douyin", "wechat"],
+                type: "douyin",
+                iframeCode: `<iframe width="3840" height="1646" frameborder="0" src="https://open.douyin.com/player/video?vid=7464933139094293810&autoplay=0" referrerpolicy="unsafe-url" allowfullscreen></iframe>`
             }
         ];
 
-        // 创建动态星空背景
-        function createStars() {
-            const starsContainer = document.getElementById('stars');
-            const starCount = 150;
-            
-            for (let i = 0; i < starCount; i++) {
-                const star = document.createElement('div');
-                star.classList.add('star');
-                
-                // 随机位置
-                const posX = Math.random() * 100;
-                const posY = Math.random() * 100;
-                
-                // 随机大小
-                const size = Math.random() * 3 + 1;
-                
-                // 随机动画时长
-                const duration = Math.random() * 5 + 2;
-                
-                star.style.left = `${posX}%`;
-                star.style.top = `${posY}%`;
-                star.style.width = `${size}px`;
-                star.style.height = `${size}px`;
-                star.style.setProperty('--duration', `${duration}s`);
-                
-                starsContainer.appendChild(star);
-            }
-        }
-        
         // 搜索功能
         function setupSearch() {
             const searchInput = document.getElementById('searchInput');
@@ -1202,7 +1360,7 @@
         // 播放器功能
         function setupPlayer() {
             const playerModal = document.getElementById('playerModal');
-            const bilibiliPlayer = document.getElementById('bilibiliPlayer');
+            let videoPlayer = document.getElementById('videoPlayer');
             const playlistItems = document.querySelectorAll('.playlist-item');
             const currentVideoTitle = document.getElementById('currentVideoTitle');
             const currentVideoDesc = document.getElementById('currentVideoDesc');
@@ -1212,7 +1370,7 @@
             // 当模态框显示时，加载第一个视频
             playerModal.addEventListener('shown.bs.modal', function () {
                 // 确保在用户主动打开后才加载视频
-                if (bilibiliPlayer.src === 'about:blank') {
+                if (videoPlayer.src === 'about:blank') {
                     loadVideo(currentVideoId);
                 }
             });
@@ -1220,7 +1378,7 @@
             // 当模态框被关闭时，清空视频源以彻底停止播放
             playerModal.addEventListener('hide.bs.modal', function () {
                 // 清空src属性，立即停止播放并卸载播放器
-                bilibiliPlayer.src = 'about:blank';
+                videoPlayer.src = 'about:blank';
             });
             
             // 点击播放列表项切换视频
@@ -1239,26 +1397,87 @@
             
             // 加载视频函数
             function loadVideo(videoId) {
-                if (videoId === currentVideoId && bilibiliPlayer.src !== 'about:blank') {
+                if (videoId === currentVideoId && videoPlayer.src !== 'about:blank') {
                     return; // 如果已经是当前视频且正在播放，则不重新加载
                 }
                 
                 currentVideoId = videoId;
                 const video = videos[videoId];
+                const playerContainer = document.querySelector('.video-player-container');
                 
                 // 更新播放器
-                bilibiliPlayer.src = video.embedUrl;
+                if (video.type === "douyin" && video.iframeCode) {
+                    // 对于抖音视频，使用完整的iframe代码
+                    playerContainer.innerHTML = video.iframeCode;
+                    // 更新对新iframe的引用
+                    videoPlayer = playerContainer.querySelector('iframe');
+                } else {
+                    // 对于B站视频，使用标准的src设置
+                    playerContainer.innerHTML = '<iframe id="videoPlayer" src="about:blank" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>';
+                    videoPlayer = document.getElementById('videoPlayer');
+                    videoPlayer.src = video.embedUrl;
+                }
                 
                 // 更新视频信息
-                currentVideoTitle.textContent = video.title;
+                currentVideoTitle.innerHTML = `${video.title} ${generatePlatformIcons(video.platforms)}`;
                 currentVideoDesc.textContent = video.description;
             }
+            
+            // 生成平台图标HTML
+            function generatePlatformIcons(platforms) {
+                let iconsHtml = '<div class="player-platform-icons">';
+                
+                platforms.forEach(platform => {
+                    switch(platform) {
+                        case 'bilibili':
+                            iconsHtml += '<i class="fab fa-bilibili player-platform-icon bilibili-icon" title="B站"></i>';
+                            break;
+                        case 'douyin':
+                            iconsHtml += '<i class="fab fa-tiktok player-platform-icon douyin-icon" title="抖音"></i>';
+                            break;
+                        case 'weibo':
+                            iconsHtml += '<i class="fab fa-weibo player-platform-icon weibo-icon" title="微博"></i>';
+                            break;
+                        case 'wechat':
+                            iconsHtml += '<i class="fab fa-weixin player-platform-icon wechat-icon" title="微信视频号"></i>';
+                            break;
+                    }
+                });
+                
+                iconsHtml += '</div>';
+                return iconsHtml;
+            }
+            
+            // 返回loadVideo函数以便外部调用
+            return {
+                loadVideo: loadVideo
+            };
+        }
+        
+        // 从外部打开播放器并加载指定视频
+        function openPlayerWithVideo(videoId) {
+            const playerModal = new bootstrap.Modal(document.getElementById('playerModal'));
+            const player = setupPlayer();
+            
+            // 更新播放列表活动状态
+            document.querySelectorAll('.playlist-item').forEach(item => {
+                item.classList.remove('active');
+                if (parseInt(item.getAttribute('data-video-id')) === videoId) {
+                    item.classList.add('active');
+                }
+            });
+            
+            // 显示模态框
+            playerModal.show();
+            
+            // 加载指定视频
+            setTimeout(() => {
+                player.loadVideo(videoId);
+            }, 500);
         }
         
         // 页面加载完成后初始化功能
         document.addEventListener('DOMContentLoaded', function() {
-            createStars();
-            
             // 轮播初始化
             const myCarousel = document.getElementById('videoCarousel');
             const carousel = new bootstrap.Carousel(myCarousel, {
