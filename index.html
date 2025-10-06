@@ -38,11 +38,74 @@
             transition: all 0.5s ease;
         }
         
+        /* 每日一言样式 */
+        .daily-quote {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: rgba(60, 60, 90, 0.85);
+            border-radius: 15px;
+            padding: 15px 20px;
+            max-width: 300px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .daily-quote:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        .quote-title {
+            font-size: 1rem;
+            color: #d66efd;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+        }
+        
+        .quote-title i {
+            margin-right: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .quote-content {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #eee;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+        
+        .quote-refresh {
+            background: transparent;
+            border: none;
+            color: var(--bilibili-blue);
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            margin-top: 5px;
+            transition: color 0.3s;
+        }
+        
+        .quote-refresh:hover {
+            color: #ff8ed4;
+        }
+        
+        .quote-refresh i {
+            margin-right: 5px;
+        }
+        
         /* 12月13日黑白效果 */
         body.memorial-day {
             filter: grayscale(100%);
             background: linear-gradient(rgba(30, 30, 30, 0.8), rgba(50, 50, 50, 0.9)), 
-                        url('https://api.btstu.cn/sjbz/api.php?lx=fengjing&format=images') no-repeat center center fixed;
+                        url('https://static.fatesinger.com/2018/01/bb653x712van6r6j.JPG') no-repeat center center fixed;
             background-size: cover;
         }
         
@@ -169,28 +232,52 @@
             letter-spacing: 1px;
         }
         
-        /* 修复生日蛋糕样式 */
+        /* 修复生日蛋糕样式 - 使其更清晰 */
         .birthday-cake {
             position: absolute;
-            top: -10px;
-            right: -50px;
-            font-size: 2.5rem;
+            top: -15px;
+            right: 15px;
+            font-size: 3rem;
             color: #ff8ed4;
             animation: bounce 2s infinite;
-            text-shadow: 0 0 10px rgba(255, 142, 212, 0.7);
-            z-index: 10;
+            text-shadow: 0 0 15px rgba(255, 142, 212, 0.9);
+            z-index: 1000;
+            display: none;
+            filter: drop-shadow(0 0 5px rgba(255, 142, 212, 0.7));
         }
         
-        /* 纪念日蜡烛样式 */
+        /* 修复纪念日蜡烛样式 - 使其更清晰 */
         .memorial-candle {
             position: absolute;
-            top: -10px;
-            left: -50px;
-            font-size: 2.5rem;
+            top: -15px;
+            left: 15px;
+            font-size: 3rem;
             color: white;
             animation: flicker 3s infinite alternate;
-            text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
-            z-index: 10;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.9);
+            z-index: 1000;
+            display: none;
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.7));
+        }
+        
+        /* 蜡烛火焰效果 */
+        .candle-flame {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .candle-flame::before {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 18px;
+            height: 28px;
+            background: radial-gradient(ellipse at center, #ffeb3b 0%, #ff9800 50%, transparent 70%);
+            border-radius: 50% 50% 20% 20%;
+            filter: blur(3px);
+            animation: flame-flicker 1.5s infinite alternate;
         }
         
         @keyframes bounce {
@@ -200,7 +287,7 @@
         
         @keyframes flicker {
             0%, 100% { 
-                opacity: 0.8;
+                opacity: 0.9;
                 transform: scale(1);
             }
             25% {
@@ -208,15 +295,34 @@
                 transform: scale(1.05);
             }
             50% {
-                opacity: 0.7;
+                opacity: 0.8;
                 transform: scale(0.95);
             }
             75% {
-                opacity: 0.9;
+                opacity: 0.95;
                 transform: scale(1.03);
             }
         }
         
+        @keyframes flame-flicker {
+            0%, 100% { 
+                transform: translateX(-50%) scale(1) rotate(0deg);
+                opacity: 0.9;
+            }
+            25% {
+                transform: translateX(-50%) scale(1.1) rotate(-2deg);
+                opacity: 1;
+            }
+            50% {
+                transform: translateX(-50%) scale(0.9) rotate(2deg);
+                opacity: 0.8;
+            }
+            75% {
+                transform: translateX(-50%) scale(1.05) rotate(-1deg);
+                opacity: 0.95;
+            }
+        }
+
         /* 搜索区域 */
         .search-container {
             max-width: 800px;
@@ -1036,6 +1142,14 @@
         }
         
         @media (max-width: 768px) {
+            .daily-quote {
+                position: relative;
+                top: 0;
+                left: 0;
+                max-width: 100%;
+                margin: 0 auto 30px;
+            }
+            
             .header h1 {
                 font-size: 2.5rem;
             }
@@ -1113,20 +1227,33 @@
             }
             
             .birthday-cake, .memorial-candle {
-                font-size: 2rem;
+                font-size: 2.5rem;
             }
             
             .birthday-cake {
-                right: -30px;
+                right: 10px;
+                top: -10px;
             }
             
             .memorial-candle {
-                left: -30px;
+                left: 10px;
+                top: -10px;
             }
         }
     </style>
 </head>
 <body>
+    <!-- 每日一言组件 -->
+    <div class="daily-quote" id="dailyQuote">
+        <div class="quote-title">
+            <i class="fas fa-quote-left"></i>每日一言
+        </div>
+        <div class="quote-content" id="quoteContent">正在加载每日一言...</div>
+        <button class="quote-refresh" id="refreshQuote">
+            <i class="fas fa-sync-alt"></i>换一句
+        </button>
+    </div>
+    
     <!-- 顶部信息栏 -->
     <div class="top-info-bar">
         <div class="current-time" id="currentTime">2025-10-06 08:33</div>
@@ -1157,12 +1284,14 @@
             <h1>
                 张皓然的作品
                 <!-- 生日蛋糕彩蛋，仅在11月16日显示 -->
-                <span class="birthday-cake" id="birthdayCake" style="display: none;">
+                <span class="birthday-cake" id="birthdayCake">
                     <i class="fas fa-birthday-cake"></i>
                 </span>
                 <!-- 纪念日蜡烛，仅在12月13日显示 -->
-                <span class="memorial-candle" id="memorialCandle" style="display: none;">
-                    <i class="fas fa-candle-holder"></i>
+                <span class="memorial-candle" id="memorialCandle">
+                    <span class="candle-flame">
+                        <i class="fas fa-candle-holder"></i>
+                    </span>
                 </span>
             </h1>
             <p>视觉创作 · 影像艺术 · 精彩瞬间</p>
@@ -1610,88 +1739,44 @@
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // 天气图标映射
-        const weatherIcons = {
-            '雾': 'https://assets.msn.cn/weathermapdata/1/static/weather/Icons/taskbar_v10/Condition_Card/FogV2.svg',
-            '阴': 'https://assets.msn.cn/weathermapdata/1/static/weather/Icons/taskbar_v10/Condition_Card/CloudyV3.svg',
-            '晴': 'https://assets.msn.cn/weathermapdata/1/static/weather/Icons/taskbar_v10/Condition_Card/SunnyDayV3.svg',
-            '多云': 'https://assets.msn.cn/weathermapdata/1/static/weather/Icons/taskbar_v10/Condition_Card/MostlyCloudyDayV2.svg',
-            '雨': 'https://assets.msn.cn/weathermapdata/1/static/weather/Icons/taskbar_v10/Condition_Card/LightRainV3.svg'
-        };
-
-        // 视频数据
-        const videos = [
-            {
-                id: 0,
-                title: "#张家界#永定区",
-                description: "探索张家界永定区的自然奇观与人文风情",
-                thumbnail: "https://youke1.picui.cn/s1/2025/10/05/68e2798edac66.jpeg",
-                embedUrl: "//player.bilibili.com/player.html?isOutside=true&aid=114805885113128&bvid=BV1bb3izbEDk&cid=30884037951&p=1",
-                platforms: ["bilibili", "douyin", "weibo", "wechat"],
-                type: "bilibili"
-            },
-            {
-                id: 1,
-                title: "#日落#张家界",
-                description: "张家界绝美日落，感受大自然的壮丽与宁静",
-                thumbnail: "https://youke1.picui.cn/s1/2025/10/05/68e2798e4ce1c.jpeg",
-                embedUrl: "//player.bilibili.com/player.html?isOutside=true&aid=114795114206739&bvid=BV16j3JzYEjG&cid=30851466951&p=1",
-                platforms: ["bilibili", "douyin", "wechat"],
-                type: "bilibili"
-            },
-            {
-                id: 2,
-                title: "#重庆#李子坝",
-                description: "山城独特风景，李子坝轻轨穿楼奇观",
-                thumbnail: "https://youke1.picui.cn/s1/2025/10/05/68e2798df3481.jpeg",
-                embedUrl: "//player.bilibili.com/player.html?isOutside=true&aid=114794057242760&bvid=BV1tq37z3Et7&cid=30846421094&p=1",
-                platforms: ["bilibili", "douyin", "wechat"],
-                type: "bilibili"
-            },
-            {
-                id: 3,
-                title: "#重庆#长江索道",
-                description: "体验重庆特色交通，俯瞰长江两岸风光",
-                thumbnail: "https://youke1.picui.cn/s1/2025/10/05/68e2798dcd900.jpeg",
-                embedUrl: "//player.bilibili.com/player.html?isOutside=true&aid=114793788741931&bvid=BV1dc3Ez9EqF&cid=30845043977&p=1",
-                platforms: ["bilibili", "douyin", "weibo", "wechat"],
-                type: "bilibili"
-            },
-            {
-                id: 4,
-                title: "#李子坝#重庆",
-                description: "穿越居民楼的轻轨，重庆特色交通景观",
-                thumbnail: "https://youke1.picui.cn/s1/2025/10/05/68e2798d9c524.jpeg",
-                embedUrl: "//player.bilibili.com/player.html?isOutside=true&aid=114794040398578&bvid=BV1MB37z6EcT&cid=30846289444&p=1",
-                platforms: ["bilibili", "douyin", "weibo", "wechat"],
-                type: "bilibili"
-            },
-            {
-                id: 5,
-                title: "#过年 #烟花",
-                description: `红绸裹着糖瓜粘住旧时光
-春联未干，墨香在阶前流淌
-母亲将月牙包进面皮褶皱
-孩子在廊下试穿新袄
-口袋揣满童话形状的爆仗
-
-直到子时绣球抛向天际
-碎金便簌簌落满青瓦
-有人指认：那是七仙女遗落的银梭
-将夜幕织成黎明的锦缎
-
-此刻所有的门扉都在发光
-雪地上脚印与车辙重叠成
-一朵朵通向春天的
-湿润的莲`,
-                thumbnail: "https://youke1.picui.cn/s1/2025/10/06/68e2fe2a84275.png",
-                embedUrl: "https://open.douyin.com/player/video?vid=7464933139094293810&autoplay=0",
-                platforms: ["douyin", "wechat"],
-                type: "douyin",
-                iframeCode: `<iframe width="3840" height="1646" frameborder="0" src="https://open.douyin.com/player/video?vid=7464933139094293810&autoplay=0" referrerpolicy="unsafe-url" allowfullscreen></iframe>`
-            }
-        ];
-
+        // 每日一言功能 - 新API版本
+        function fetchDailyQuote() {
+            const quoteContent = document.getElementById('quoteContent');
+            
+            // 显示加载状态
+            quoteContent.textContent = '正在加载每日一言...';
+            
+            // 使用新的API获取每日一言
+            fetch('https://uapis.cn/api/say')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('网络响应不正常');
+                    }
+                    return response.text(); // 新API直接返回文本内容
+                })
+                .then(quote => {
+                    // 直接使用返回的文本作为内容
+                    quoteContent.textContent = quote;
+                })
+                .catch(error => {
+                    console.error('获取每日一言失败:', error);
+                    quoteContent.textContent = '获取每日一言失败，请稍后重试';
+                    
+                    // 备用方案：使用默认名言
+                    setTimeout(() => {
+                        const fallbackQuotes = [
+                            "生活不止眼前的苟且，还有诗和远方的田野。",
+                            "成功的秘诀在于对目标的执着追求。",
+                            "每一天都是新的开始，把握当下，创造未来。",
+                            "坚持就是胜利，不要轻言放弃。",
+                            "梦想不会逃跑，会逃跑的永远都是自己。"
+                        ];
+                        const randomQuote = fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)];
+                        quoteContent.textContent = randomQuote;
+                    }, 2000);
+                });
+        }
+        
         // 时间显示功能
         function updateTime() {
             const now = new Date();
@@ -1704,7 +1789,12 @@
             const timeString = `${year}-${month}-${day} ${hours}:${minutes}`;
             document.getElementById('currentTime').textContent = timeString;
             
-            // 检查是否是11月16日，如果是则显示生日蛋糕
+            // 测试代码 - 强制显示蛋糕和蜡烛进行测试
+            // 实际使用时，请删除以下两行测试代码
+            document.getElementById('birthdayCake').style.display = 'inline';
+            document.getElementById('memorialCandle').style.display = 'inline';
+            
+            // 实际代码 - 检查是否是11月16日，如果是则显示生日蛋糕
             const isBirthday = (month === '11' && day === '16');
             document.getElementById('birthdayCake').style.display = isBirthday ? 'inline' : 'none';
             
@@ -1755,19 +1845,37 @@
                 
                 // 设置天气图标
                 const weatherCondition = data.results[0].now.text;
-                let iconUrl = weatherIcons['晴']; // 默认图标
+                const currentHour = new Date().getHours();
+                const isNight = currentHour >= 18 || currentHour < 6; // 晚上6点到早上6点算夜间
                 
+                let iconUrl = 'https://assets.msn.cn/weathermapdata/1/static/weather/Icons/taskbar_v10/Condition_Card/SunnyDayV3.svg'; // 默认图标
+                
+                // 更全面的天气图标映射
                 if (weatherCondition) {
                     if (weatherCondition.includes('雾')) {
-                        iconUrl = weatherIcons['雾'];
+                        iconUrl = 'https://assets.msn.cn/weathermapdata/1/static/weather/Icons/taskbar_v10/Condition_Card/FogV2.svg';
                     } else if (weatherCondition.includes('阴')) {
-                        iconUrl = weatherIcons['阴'];
+                        iconUrl = 'https://assets.msn.cn/weathermapdata/1/static/weather/Icons/taskbar_v10/Condition_Card/CloudyV3.svg';
                     } else if (weatherCondition.includes('晴')) {
-                        iconUrl = weatherIcons['晴'];
+                        if (isNight) {
+                            iconUrl = 'https://assets.msn.cn/weathermapdata/1/static/weather/Icons/taskbar_v10/Condition_Card/ClearNightV3.svg';
+                        } else {
+                            iconUrl = 'https://assets.msn.cn/weathermapdata/1/static/weather/Icons/taskbar_v10/Condition_Card/SunnyDayV3.svg';
+                        }
+                    } else if (weatherCondition.includes('多云')) {
+                        if (isNight) {
+                            iconUrl = 'https://assets.msn.cn/weathermapdata/1/static/weather/Icons/taskbar_v10/Condition_Card/MostlyCloudyNightV2.svg';
+                        } else {
+                            iconUrl = 'https://assets.msn.cn/weathermapdata/1/static/weather/Icons/taskbar_v10/Condition_Card/MostlyCloudyDayV2.svg';
+                        }
                     } else if (weatherCondition.includes('云')) {
-                        iconUrl = weatherIcons['多云'];
+                        iconUrl = 'https://assets.msn.cn/weathermapdata/1/static/weather/Icons/taskbar_v10/Condition_Card/MostlyCloudyDayV2.svg';
                     } else if (weatherCondition.includes('雨')) {
-                        iconUrl = weatherIcons['雨'];
+                        iconUrl = 'https://assets.msn.cn/weathermapdata/1/static/weather/Icons/taskbar_v10/Condition_Card/LightRainV3.svg';
+                    } else if (weatherCondition.includes('雪')) {
+                        iconUrl = 'https://assets.msn.cn/weathermapdata/1/static/trend/Snow.svg';
+                    } else if (weatherCondition.includes('雷')) {
+                        iconUrl = 'https://assets.msn.cn/weathermapdata/1/static/weather/Icons/taskbar_v10/Condition_Card/ThunderstormV3.svg';
                     }
                 }
                 
@@ -1784,7 +1892,7 @@
                 const weatherInfo = document.getElementById('weatherInfo');
                 weatherInfo.innerHTML = `
                     <div class="weather-icon">
-                        <img src="${weatherIcons['晴']}" alt="天气图标">
+                        <img src="https://assets.msn.cn/weathermapdata/1/static/weather/Icons/taskbar_v10/Condition_Card/SunnyDayV3.svg" alt="天气图标">
                     </div>
                     <div class="weather-details">
                         <div class="weather-location">未获取到信息</div>
@@ -2029,7 +2137,15 @@
                 }
                 
                 currentVideoId = videoId;
-                const video = videos[videoId];
+                const video = {
+                    id: 0,
+                    title: "#张家界#永定区",
+                    description: "探索张家界永定区的自然奇观与人文风情",
+                    thumbnail: "https://youke1.picui.cn/s1/2025/10/05/68e2798edac66.jpeg",
+                    embedUrl: "//player.bilibili.com/player.html?isOutside=true&aid=114805885113128&bvid=BV1bb3izbEDk&cid=30884037951&p=1",
+                    platforms: ["bilibili", "douyin", "weibo", "wechat"],
+                    type: "bilibili"
+                };
                 const playerContainer = document.querySelector('.video-player-container');
                 
                 // 更新播放器
@@ -2128,6 +2244,9 @@
         
         // 页面加载完成后初始化功能
         document.addEventListener('DOMContentLoaded', function() {
+            // 初始化每日一言
+            fetchDailyQuote();
+            
             // 初始化时间显示
             updateTime();
             setInterval(updateTime, 60000); // 每分钟更新一次
@@ -2162,6 +2281,9 @@
             
             // 初始化返回顶部功能
             setupBackToTop();
+            
+            // 每日一言刷新按钮
+            document.getElementById('refreshQuote').addEventListener('click', fetchDailyQuote);
         });
     </script>
 </body>
