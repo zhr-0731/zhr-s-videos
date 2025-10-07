@@ -237,13 +237,14 @@
             position: absolute;
             top: -15px;
             right: 15px;
-            font-size: 3rem;
+            font-size: 3.5rem;
             color: #ff8ed4;
             animation: bounce 2s infinite;
-            text-shadow: 0 0 15px rgba(255, 142, 212, 0.9);
+            text-shadow: 0 0 20px rgba(255, 142, 212, 0.9);
             z-index: 1000;
             display: none;
-            filter: drop-shadow(0 0 5px rgba(255, 142, 212, 0.7));
+            filter: drop-shadow(0 0 8px rgba(255, 142, 212, 0.8));
+            transition: all 0.3s ease;
         }
         
         /* 修复纪念日蜡烛样式 - 使其更清晰 */
@@ -251,13 +252,14 @@
             position: absolute;
             top: -15px;
             left: 15px;
-            font-size: 3rem;
+            font-size: 3.5rem;
             color: white;
             animation: flicker 3s infinite alternate;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.9);
+            text-shadow: 0 0 25px rgba(255, 255, 255, 0.9);
             z-index: 1000;
             display: none;
-            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.7));
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
+            transition: all 0.3s ease;
         }
         
         /* 蜡烛火焰效果 */
@@ -269,38 +271,42 @@
         .candle-flame::before {
             content: '';
             position: absolute;
-            top: -12px;
+            top: -15px;
             left: 50%;
             transform: translateX(-50%);
-            width: 18px;
-            height: 28px;
+            width: 20px;
+            height: 30px;
             background: radial-gradient(ellipse at center, #ffeb3b 0%, #ff9800 50%, transparent 70%);
             border-radius: 50% 50% 20% 20%;
-            filter: blur(3px);
+            filter: blur(4px);
             animation: flame-flicker 1.5s infinite alternate;
         }
         
         @keyframes bounce {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+            50% { transform: translateY(-12px); }
         }
         
         @keyframes flicker {
             0%, 100% { 
-                opacity: 0.9;
+                opacity: 0.95;
                 transform: scale(1);
+                text-shadow: 0 0 25px rgba(255, 255, 255, 0.9);
             }
             25% {
                 opacity: 1;
-                transform: scale(1.05);
+                transform: scale(1.08);
+                text-shadow: 0 0 30px rgba(255, 255, 255, 1);
             }
             50% {
-                opacity: 0.8;
-                transform: scale(0.95);
+                opacity: 0.85;
+                transform: scale(0.98);
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
             }
             75% {
-                opacity: 0.95;
-                transform: scale(1.03);
+                opacity: 0.98;
+                transform: scale(1.05);
+                text-shadow: 0 0 28px rgba(255, 255, 255, 0.95);
             }
         }
         
@@ -310,15 +316,15 @@
                 opacity: 0.9;
             }
             25% {
-                transform: translateX(-50%) scale(1.1) rotate(-2deg);
+                transform: translateX(-50%) scale(1.15) rotate(-3deg);
                 opacity: 1;
             }
             50% {
-                transform: translateX(-50%) scale(0.9) rotate(2deg);
+                transform: translateX(-50%) scale(0.95) rotate(3deg);
                 opacity: 0.8;
             }
             75% {
-                transform: translateX(-50%) scale(1.05) rotate(-1deg);
+                transform: translateX(-50%) scale(1.08) rotate(-2deg);
                 opacity: 0.95;
             }
         }
@@ -1226,8 +1232,9 @@
                 width: 160px;
             }
             
+            /* 移动端蛋糕和蜡烛调整 */
             .birthday-cake, .memorial-candle {
-                font-size: 2.5rem;
+                font-size: 2.8rem;
             }
             
             .birthday-cake {
@@ -1238,6 +1245,12 @@
             .memorial-candle {
                 left: 10px;
                 top: -10px;
+            }
+            
+            .candle-flame::before {
+                top: -12px;
+                width: 16px;
+                height: 24px;
             }
         }
     </style>
@@ -1739,7 +1752,7 @@
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // 每日一言功能 - 新API版本
+        // 每日一言功能
         function fetchDailyQuote() {
             const quoteContent = document.getElementById('quoteContent');
             
@@ -1777,6 +1790,79 @@
                 });
         }
         
+        // 视频数据定义
+        const videos = [
+            {
+                id: 0,
+                title: "#张家界#永定区",
+                description: "探索张家界永定区的自然奇观与人文风情",
+                thumbnail: "https://youke1.picui.cn/s1/2025/10/05/68e2798edac66.jpeg",
+                embedUrl: "//player.bilibili.com/player.html?isOutside=true&aid=114805885113128&bvid=BV1bb3izbEDk&cid=30884037951&p=1",
+                platforms: ["bilibili", "douyin", "weibo", "wechat"],
+                type: "bilibili"
+            },
+            {
+                id: 1,
+                title: "#日落#张家界",
+                description: "张家界绝美日落，感受大自然的壮丽与宁静",
+                thumbnail: "https://youke1.picui.cn/s1/2025/10/05/68e2798e4ce1c.jpeg",
+                embedUrl: "//player.bilibili.com/player.html?isOutside=true&aid=114795114206739&bvid=BV16j3JzYEjG&cid=30851466951&p=1",
+                platforms: ["bilibili", "douyin", "wechat"],
+                type: "bilibili"
+            },
+            {
+                id: 2,
+                title: "#重庆#李子坝",
+                description: "山城独特风景，李子坝轻轨穿楼奇观",
+                thumbnail: "https://youke1.picui.cn/s1/2025/10/05/68e2798df3481.jpeg",
+                embedUrl: "//player.bilibili.com/player.html?isOutside=true&aid=114794057242760&bvid=BV1tq37z3Et7&cid=30846421094&p=1",
+                platforms: ["bilibili", "douyin", "wechat"],
+                type: "bilibili"
+            },
+            {
+                id: 3,
+                title: "#重庆#长江索道",
+                description: "体验重庆特色交通，俯瞰长江两岸风光",
+                thumbnail: "https://youke1.picui.cn/s1/2025/10/05/68e2798dcd900.jpeg",
+                embedUrl: "//player.bilibili.com/player.html?isOutside=true&aid=114793788741931&bvid=BV1dc3Ez9EqF&cid=30845043977&p=1",
+                platforms: ["bilibili", "douyin", "weibo", "wechat"],
+                type: "bilibili"
+            },
+            {
+                id: 4,
+                title: "#李子坝#重庆",
+                description: "穿越居民楼的轻轨，重庆特色交通景观",
+                thumbnail: "https://youke1.picui.cn/s1/2025/10/05/68e2798d9c524.jpeg",
+                embedUrl: "//player.bilibili.com/player.html?isOutside=true&aid=114794040398578&bvid=BV1MB37z6EcT&cid=30846289444&p=1",
+                platforms: ["bilibili", "douyin", "weibo", "wechat"],
+                type: "bilibili"
+            },
+            {
+                id: 5,
+                title: "#过年 #烟花",
+                description: `红绸裹着糖瓜粘住旧时光
+春联未干，墨香在阶前流淌
+母亲将月牙包进面皮褶皱
+孩子在廊下试穿新袄
+口袋揣满童话形状的爆仗
+
+直到子时绣球抛向天际
+碎金便簌簌落满青瓦
+有人指认：那是七仙女遗落的银梭
+将夜幕织成黎明的锦缎
+
+此刻所有的门扉都在发光
+雪地上脚印与车辙重叠成
+一朵朵通向春天的
+湿润的莲`,
+                thumbnail: "https://youke1.picui.cn/s1/2025/10/06/68e2fe2a84275.png",
+                embedUrl: "https://open.douyin.com/player/video?vid=7464933139094293810&autoplay=0",
+                platforms: ["douyin", "wechat"],
+                type: "douyin",
+                iframeCode: `<iframe width="3840" height="1646" frameborder="0" src="https://open.douyin.com/player/video?vid=7464933139094293810&autoplay=0" referrerpolicy="unsafe-url" allowfullscreen></iframe>`
+            }
+        ];
+
         // 时间显示功能
         function updateTime() {
             const now = new Date();
@@ -1789,12 +1875,7 @@
             const timeString = `${year}-${month}-${day} ${hours}:${minutes}`;
             document.getElementById('currentTime').textContent = timeString;
             
-            // 测试代码 - 强制显示蛋糕和蜡烛进行测试
-            // 实际使用时，请删除以下两行测试代码
-            document.getElementById('birthdayCake').style.display = 'inline';
-            document.getElementById('memorialCandle').style.display = 'inline';
-            
-            // 实际代码 - 检查是否是11月16日，如果是则显示生日蛋糕
+            // 检查是否是11月16日，如果是则显示生日蛋糕
             const isBirthday = (month === '11' && day === '16');
             document.getElementById('birthdayCake').style.display = isBirthday ? 'inline' : 'none';
             
@@ -2137,15 +2218,7 @@
                 }
                 
                 currentVideoId = videoId;
-                const video = {
-                    id: 0,
-                    title: "#张家界#永定区",
-                    description: "探索张家界永定区的自然奇观与人文风情",
-                    thumbnail: "https://youke1.picui.cn/s1/2025/10/05/68e2798edac66.jpeg",
-                    embedUrl: "//player.bilibili.com/player.html?isOutside=true&aid=114805885113128&bvid=BV1bb3izbEDk&cid=30884037951&p=1",
-                    platforms: ["bilibili", "douyin", "weibo", "wechat"],
-                    type: "bilibili"
-                };
+                const video = videos[videoId];
                 const playerContainer = document.querySelector('.video-player-container');
                 
                 // 更新播放器
