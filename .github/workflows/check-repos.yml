@@ -45,21 +45,26 @@ jobs:
             fi
           done
 
+          # export outputs for later steps
           echo "failed=${failed}" >> $GITHUB_OUTPUT
           echo "body<<EOF" >> $GITHUB_OUTPUT
           echo -e "$body" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Send email if any failures
-        if: steps.check.outputs.failed != '0'
+      - name: Send status email (always)
+        # always run the step even if previous steps failed
+        if: always()
+        continue-on-error: true
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: ${{ secrets.SMTP_SERVER }}
           server_port: ${{ secrets.SMTP_PORT }}
           username: ${{ secrets.SMTP_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
+          # 如果你 SMTP 使用 465 (SMTPS/implicit TLS) -> secure: true
+          # 如果你 SMTP 使用 587 (STARTTLS) -> secure: false
           secure: true
           from: ${{ secrets.EMAIL_FROM }}
           to: "13974478440@139.com"
-          subject: "ALERT: repository accessibility problem"
+          subject: "Repository accessibility status — ${{ steps.check.outputs.failed }} failures"
           body: ${{ steps.check.outputs.body }}
