@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 env:
-  REPOS: "zhr-0731/zhr-s-videos"  # 你要求监控的仓库（仅此一个）
+  REPOS: "zhr-0731/zhr-s-videos"
 
 jobs:
   check-repos:
@@ -32,27 +32,52 @@ jobs:
         run: |
           IFS=',' read -ra REPO_LIST <<< "${REPOS}"
           failed=0
-          body="Repository accessibility check run at $(date -u +\"%Y-%m-%dT%H:%M:%SZ\") UTC\n\n"
+          plain_body="仓库可访问性检查运行时间：$(date -u +\"%Y-%m-%dT%H:%M:%SZ\") UTC\n\n"
           for r in "${REPO_LIST[@]}"; do
-            repo=$(echo "$r" | xargs)  # trim whitespace
+            repo=$(echo "$r" | xargs)
             echo "Checking $repo ..."
             status=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: token ${{ steps.choose-token.outputs.token }}" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/$repo")
             if [ "$status" != "200" ]; then
               failed=$((failed+1))
-              body="$body- $repo -> HTTP $status\n"
+              plain_body="$plain_body- $repo -> HTTP $status\n"
             else
-              body="$body- $repo -> OK (HTTP $status)\n"
+              plain_body="$plain_body- $repo -> OK (HTTP $status)\n"
             fi
           done
 
-          # export outputs for later steps
           echo "failed=${failed}" >> $GITHUB_OUTPUT
-          echo "body<<EOF" >> $GITHUB_OUTPUT
-          echo -e "$body" >> $GITHUB_OUTPUT
+          echo "plain_body<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$plain_body" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Build HTML status email
+        id: build-html
+        run: |
+          FAILED=${{ steps.check.outputs.failed }}
+          SUMMARY="${{ steps.check.outputs.plain_body }}"
+
+          # Build a visually nice HTML email in Chinese
+          html="<!doctype html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<style>\n  body{font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif; background:#f5f7fa; color:#333; margin:0; padding:20px;}\n  .card{max-width:720px;margin:0 auto;background:#fff;border-radius:12px;box-shadow:0 6px 30px rgba(0,0,0,0.08);overflow:hidden}\n  .header{padding:22px 24px;background:linear-gradient(90deg,#4f46e5,#06b6d4);color:#fff}\n  .title{font-size:18px;margin:0 0 6px}\n  .time{font-size:12px;opacity:0.95;margin:0}\n  .content{padding:18px 24px}\n  table{width:100%;border-collapse:collapse;margin-top:8px}\n  th,td{padding:12px 10px;text-align:left;border-bottom:1px solid #f0f0f0}\n  th{background:#fafafa;font-weight:600}\n  .status-ok{color:#16a34a;font-weight:700}\n  .status-fail{color:#dc2626;font-weight:700}\n  .badge{display:inline-block;padding:6px 10px;border-radius:999px;font-size:12px;color:#fff}\n  .ok-badge{background:#10b981}\n  .fail-badge{background:#ef4444}\n  .footer{padding:12px 24px;font-size:13px;color:#666;background:#fbfbfb}\n  pre{white-space:pre-wrap;font-family:inherit;background:transparent;border:none;padding:0;margin:0}\n</style>\n</head>\n<body>\n  <div class=\"card\">\n    <div class=\"header\">\n      <p class=\"title\">仓库可访问性状态报告</p>\n      <p class=\"time\">运行时间：$(date -u +\"%Y-%m-%dT%H:%M:%SZ\") UTC</p>\n    </div>\n    <div class=\"content\">\n      <div style=\"display:flex;justify-content:space-between;align-items:center;margin-bottom:8px\">\n        <div>检测对象：<strong>${REPOS}</strong></div>\n        <div>\n          <span class=\"badge ${FAILED:+fail-badge ok-badge}\">${FAILED:-0} 异常</span>\n        </div>\n      </div>\n      <table>\n        <thead><tr><th>仓库</th><th>状态</th></tr></thead>\n        <tbody>\n"
+
+          IFS=',' read -ra REPO_LIST <<< "${REPOS}"
+          for r in "${REPO_LIST[@]}"; do
+            repo=$(echo "$r" | xargs)
+            status=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: token ${{ steps.choose-token.outputs.token }}" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/$repo")
+            if [ "$status" = "200" ]; then
+              row="<tr><td>${repo}</td><td class=\"status-ok\">✅ 可访问 (HTTP ${status})</td></tr>\n"
+            else
+              row="<tr><td>${repo}</td><td class=\"status-fail\">❌ 不可访问 (HTTP ${status})</td></tr>\n"
+            fi
+            html+=$row
+          done
+
+          html+="</tbody>\n      </table>\n    </div>\n    <div class=\"footer\">\n      <p style=\"margin:0 0 8px\">摘要：${FAILED} 个异常</p>\n      <pre>${SUMMARY}</pre>\n    </div>\n  </div>\n</body>\n</html>"
+
+          echo "html<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$html" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Send status email (always)
-        # always run the step even if previous steps failed
         if: always()
         continue-on-error: true
         uses: dawidd6/action-send-mail@v3
@@ -61,10 +86,10 @@ jobs:
           server_port: ${{ secrets.SMTP_PORT }}
           username: ${{ secrets.SMTP_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
-          # 如果你 SMTP 使用 465 (SMTPS/implicit TLS) -> secure: true
-          # 如果你 SMTP 使用 587 (STARTTLS) -> secure: false
+          # 如使用 465 -> secure: true；如使用 587(STARTTLS) -> secure: false
           secure: true
           from: ${{ secrets.EMAIL_FROM }}
           to: "13974478440@139.com"
-          subject: "Repository accessibility status — ${{ steps.check.outputs.failed }} failures"
-          body: ${{ steps.check.outputs.body }}
+          subject: "[状态] 仓库可访问性报告 — ${{ steps.check.outputs.failed }} 个异常"
+          body: ${{ steps.build-html.outputs.html }}
+          content_type: text/html
