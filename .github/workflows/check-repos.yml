@@ -1,0 +1,65 @@
+name: hourly-repo-access-check
+
+on:
+  schedule:
+    - cron: '0 * * * *'   # 每小时第0分钟运行一次
+  workflow_dispatch:     # 允许手动触发
+
+permissions:
+  contents: read
+
+env:
+  REPOS: "zhr-0731/zhr-s-videos"  # 你要求监控的仓库（仅此一个）
+
+jobs:
+  check-repos:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Choose token
+        id: choose-token
+        run: |
+          if [ -n "${{ secrets.CHECK_TOKEN }}" ]; then
+            echo "token=${{ secrets.CHECK_TOKEN }}" >> $GITHUB_OUTPUT
+            echo "Using CHECK_TOKEN"
+          else
+            echo "token=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_OUTPUT
+            echo "Using GITHUB_TOKEN"
+          fi
+
+      - name: Check repository accessibility
+        id: check
+        run: |
+          IFS=',' read -ra REPO_LIST <<< "${REPOS}"
+          failed=0
+          body="Repository accessibility check run at $(date -u +\"%Y-%m-%dT%H:%M:%SZ\") UTC\n\n"
+          for r in "${REPO_LIST[@]}"; do
+            repo=$(echo "$r" | xargs)  # trim whitespace
+            echo "Checking $repo ..."
+            status=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: token ${{ steps.choose-token.outputs.token }}" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/$repo")
+            if [ "$status" != "200" ]; then
+              failed=$((failed+1))
+              body="$body- $repo -> HTTP $status\n"
+            else
+              body="$body- $repo -> OK (HTTP $status)\n"
+            fi
+          done
+
+          echo "failed=${failed}" >> $GITHUB_OUTPUT
+          echo "body<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$body" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Send email if any failures
+        if: steps.check.outputs.failed != '0'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          secure: true
+          from: ${{ secrets.EMAIL_FROM }}
+          to: "13974478440@139.com"
+          subject: "ALERT: repository accessibility problem"
+          body: ${{ steps.check.outputs.body }}
