@@ -11,9 +11,7 @@ permissions:
 
 env:
   REPOS: "zhr-0731/zhr-s-videos"
-  # 固定收件人（每次运行都发送状态邮件到这两个地址）
   FIXED_RECIPIENTS: "zhr_955@sina.com,zhr_898@qq.com"
-  # 触发自动回复的允许发件人列表（IMAP 检查时匹配）
   ALLOWED_QUERY_SENDERS: "13974478440@139.com,zhr_955@sina.com,zhr_898@qq.com,suibian1666@petalmail.com"
   QUERY_MATCH_TEXT: "查询zhr-s-videos"
 
@@ -51,19 +49,23 @@ jobs:
             fi
           done
 
+          # export outputs and write temp files that later steps can read safely
           echo "failed=${failed}" >> $GITHUB_OUTPUT
           echo "plain_body<<EOF" >> $GITHUB_OUTPUT
           echo -e "$plain_body" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
+          # also save to temp files for IMAP python step to read
+          printf "%s" "$plain_body" > /tmp/status_email.txt || true
+
       - name: Build HTML status email
         id: build-html
         run: |
           FAILED=${{ steps.check.outputs.failed }}
-          SUMMARY="${{ steps.check.outputs.plain_body }}"
+          PLAIN="$(cat /tmp/status_email.txt || echo '')"
           REPOS_ESCAPED="${REPOS}"
 
-          html="<!doctype html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<style>\n  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,'Noto Sans','Microsoft YaHei',sans-serif;background:#f5f7fa;margin:0;padding:20px;color:#333}\n  .card{max-width:760px;margin:0 auto;background:#fff;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.08);overflow:hidden}\n  .header{padding:20px 24px;background:linear-gradient(90deg,#4f46e5,#06b6d4);color:#fff}\n  .title{font-size:18px;margin:0}\n  .time{font-size:12px;opacity:0.95;margin:4px 0 0}\n  .content{padding:18px 24px}\n  table{width:100%;border-collapse:collapse;margin-top:8px}\n  th,td{padding:12px 10px;text-align:left;border-bottom:1px solid #f0f0f0}\n  th{background:#fafafa;font-weight:600}\n  .status-ok{color:#16a34a;font-weight:700}\n  .status-fail{color:#dc2626;font-weight:700}\n  .footer{padding:12px 24px;font-size:13px;color:#666;background:#fbfbfb}\n  pre{white-space:pre-wrap;font-family:inherit;background:transparent;border:none;padding:0;margin:0}\n</style>\n</head>\n<body>\n  <div class=\"card\">\n    <div class=\"header\">\n      <p class=\"title\">仓库可访问性状态报告</p>\n      <p class=\"time\">运行时间：$(date -u +\"%Y-%m-%dT%H:%M:%SZ\") UTC</p>\n    </div>\n    <div class=\"content\">\n      <div style=\"display:flex;justify-content:space-between;align-items:center;margin-bottom:8px\">\n        <div>检测对象：<strong>${REPOS_ESCAPED}</strong></div>\n        <div><span style=\"display:inline-block;padding:6px 10px;border-radius:999px;background:${FAILED##0:+#ef4444};color:#fff;font-weight:700\">${FAILED:-0} 异常</span></div>\n      </div>\n      <table>\n        <thead><tr><th>仓库</th><th>状态</th></tr></thead>\n        <tbody>\n"
+          html="<!doctype html>\n<html lang=\"zh-CN\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<style>\n  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,'Noto Sans','Microsoft YaHei',sans-serif;background:#f5f7fa;margin:0;padding:20px;color:#333}\n  .card{max-width:760px;margin:0 auto;background:#fff;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.08);overflow:hidden}\n  .header{padding:20px 24px;background:linear-gradient(90deg,#4f46e5,#06b6d4);color:#fff}\n  .title{font-size:18px;margin:0}\n  .time{font-size:12px;opacity:0.95;margin:4px 0 0}\n  .content{padding:18px 24px}\n  table{width:100%;border-collapse:collapse;margin-top:8px}\n  th,td{padding:12px 10px;text-align:left;border-bottom:1px solid #f0f0f0}\n  th{background:#fafafa;font-weight:600}\n  .status-ok{color:#16a34a;font-weight:700}\n  .status-fail{color:#dc2626;font-weight:700}\n  .footer{padding:12px 24px;font-size:13px;color:#666;background:#fbfbfb}\n  pre{white-space:pre-wrap;font-family:inherit;background:transparent;border:none;padding:0;margin:0}\n</style>\n</head>\n<body>\n  <div class=\"card\">\n    <div class=\"header\">\n      <p class=\"title\">仓库可访问性状态报告</p>\n      <p class=\"time\">运行时间：$(date -u +\"%Y-%m-%dT%H:%M:%SZ\") UTC</p>\n    </div>\n    <div class=\"content\">\n      <div style=\"display:flex;justify-content:space-between;align-items:center;margin-bottom:8px\">\n        <div>检测对象：<strong>${REPOS_ESCAPED}</strong></div>\n        <div><span style=\"display:inline-block;padding:6px 10px;border-radius:999px;background:#ef4444;color:#fff;font-weight:700\">${FAILED:-0} 异常</span></div>\n      </div>\n      <table>\n        <thead><tr><th>仓库</th><th>状态</th></tr></thead>\n        <tbody>\n"
 
           IFS=',' read -ra REPO_LIST <<< "${REPOS}"
           for r in "${REPO_LIST[@]}"; do
@@ -77,12 +79,14 @@ jobs:
             html+=$row
           done
 
-          html+="</tbody>\n      </table>\n    </div>\n    <div class=\"footer\">\n      <p style=\"margin:0 0 8px\">摘要：${FAILED} 个异常</p>\n      <pre>${SUMMARY}</pre>\n    </div>\n  </div>\n</body>\n</html>"
+          html+="</tbody>\n      </table>\n    </div>\n    <div class=\"footer\">\n      <p style=\"margin:0 0 8px\">摘要：${FAILED} 个异常</p>\n      <pre>${PLAIN}</pre>\n    </div>\n  </div>\n</body>\n</html>"
 
-          # export outputs
+          # export step output and save HTML to temp file for python step
           echo "html<<EOF" >> $GITHUB_OUTPUT
           echo -e "$html" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
+
+          printf "%s" "$html" > /tmp/status_email.html || true
 
       - name: Send status email to fixed recipients (always)
         if: always()
@@ -102,7 +106,7 @@ jobs:
           content_type: text/html
 
       - name: Check mailbox for incoming queries and reply (optional IMAP)
-        if: ${{ secrets.IMAP_SERVER != '' && secrets.IMAP_USERNAME != '' && secrets.IMAP_PASSWORD != '' }}
+        if: ${{ secrets.IMAP_SERVER && secrets.IMAP_USERNAME && secrets.IMAP_PASSWORD }}
         env:
           IMAP_SERVER: ${{ secrets.IMAP_SERVER }}
           IMAP_PORT: ${{ secrets.IMAP_PORT }}
@@ -133,85 +137,65 @@ jobs:
           allowed = [s.strip().lower() for s in os.environ.get("ALLOWED_SENDERS","").split(",") if s.strip()]
           qtext = os.environ.get("QUERY_TEXT","查询zhr-s-videos")
 
-          # load status HTML and plain summary from files generated by workflow outputs
-          # The build-html output is available via env interpolation above; as simpler approach, reconstruct
-          html = os.environ.get("BUILD_HTML") or None
-          # If GITHUB_OUTPUT html not passed, try to read from env variable (GitHub Actions sets outputs)
-          if not html:
-            # attempt to read from file if present
-            try:
-              with open('/tmp/status_email.html','r',encoding='utf-8') as f:
-                html = f.read()
-            except Exception:
-              html = "<p>无法获取状态内容</p>"
-          plain = os.environ.get("PLAIN_BODY") or "仓库可访问性检查结果"
+          # Read generated files
+          try:
+            with open('/tmp/status_email.html','r',encoding='utf-8') as f:
+              html = f.read()
+          except Exception:
+            html = "<p>无法获取状态内容</p>"
+          try:
+            with open('/tmp/status_email.txt','r',encoding='utf-8') as f:
+              plain = f.read()
+          except Exception:
+            plain = "仓库可访问性检查结果"
 
-          # Connect to IMAP and search UNSEEN messages
+          reply_to_list = set()
           try:
             M = imaplib.IMAP4_SSL(imap_server, imap_port)
             M.login(imap_user, imap_pwd)
             M.select("INBOX")
             typ, data = M.search(None, '(UNSEEN)')
-            if typ != 'OK':
-              print("IMAP search failed:", typ, data)
-            msg_nums = data[0].split()
-            reply_to_list = set()
-            for num in msg_nums:
-              typ, msg_data = M.fetch(num, '(RFC822)')
-              if typ != 'OK':
-                continue
-              raw = msg_data[0][1]
-              msg = email.message_from_bytes(raw)
-              subj = msg.get('Subject','')
-              fr = parseaddr(msg.get('From'))[1].lower()
-              # get body text
-              body = ""
-              if msg.is_multipart():
-                for part in msg.walk():
-                  ctype = part.get_content_type()
-                  if ctype == 'text/plain' and part.get_content_disposition() in (None, 'inline'):
-                    try:
-                      body += part.get_payload(decode=True).decode(part.get_content_charset() or 'utf-8', errors='ignore')
-                    except:
-                      body += str(part.get_payload(decode=True))
-              else:
-                try:
-                  body = msg.get_payload(decode=True).decode(msg.get_content_charset() or 'utf-8', errors='ignore')
-                except:
-                  body = str(msg.get_payload(decode=True))
-              # match subject and body containing query text, and sender in allowed list
-              if qtext in (subj or "") or qtext in (body or ""):
-                if fr in allowed:
-                  reply_to_list.add(fr)
-              # mark seen to avoid repeated replies
-              M.store(num, '+FLAGS', '\\Seen')
+            if typ == 'OK':
+              for num in data[0].split():
+                typ, msg_data = M.fetch(num, '(RFC822)')
+                if typ != 'OK' or not msg_data or not msg_data[0]:
+                  continue
+                raw = msg_data[0][1]
+                msg = email.message_from_bytes(raw)
+                subj = msg.get('Subject','') or ''
+                fr = parseaddr(msg.get('From'))[1].lower()
+                body = ""
+                if msg.is_multipart():
+                  for part in msg.walk():
+                    ctype = part.get_content_type()
+                    if ctype == 'text/plain' and part.get_content_disposition() in (None, 'inline'):
+                      try:
+                        body += part.get_payload(decode=True).decode(part.get_content_charset() or 'utf-8', errors='ignore')
+                      except:
+                        body += str(part.get_payload(decode=True))
+                else:
+                  try:
+                    body = msg.get_payload(decode=True).decode(msg.get_content_charset() or 'utf-8', errors='ignore')
+                  except:
+                    body = str(msg.get_payload(decode=True))
+                if (qtext in subj) or (qtext in body):
+                  if fr in allowed:
+                    reply_to_list.add(fr)
+                # mark seen
+                M.store(num, '+FLAGS', '\\Seen')
             M.logout()
           except Exception as e:
             print("IMAP check failed:", e)
-            reply_to_list = set()
 
-          # prepare email content (use environment HTML if provided)
-          # try read ACTION output for build-html if available
-          html_content = os.environ.get("HTML_CONTENT")
-          if not html_content:
-            # try to fetch build-html output from environment variable substitution set by step (may not exist)
-            html_content = os.environ.get("GITHUB_ENV_HTML","")
-          if not html_content:
-            # fallback: very simple HTML body built from plain
-            html_content = "<pre>{}</pre>".format(plain)
-
-          # send status email to each requester
           def send_mail(to_addr):
             try:
               msg = EmailMessage()
-              subj = "[状态] 仓库可访问性报告 — %s" % (plain.splitlines()[2] if len(plain.splitlines())>2 else "")
+              subj = "[状态] 仓库可访问性报告"
               msg['Subject'] = subj
               msg['From'] = email_from
               msg['To'] = to_addr
               msg.set_content(plain)
-              msg.add_alternative(html_content, subtype='html')
-
-              # choose SMTP connection mode depending on port
+              msg.add_alternative(html, subtype='html')
               if smtp_port == 465:
                 context = ssl.create_default_context()
                 with smtplib.SMTP_SSL(smtp_server, smtp_port, context=context) as s:
@@ -231,13 +215,3 @@ jobs:
             send_mail(to_addr)
           print("Reply list:", reply_to_list)
           PY
-        # pass build-html outputs into files/env so python can use them (best-effort)
-        # write outputs to temporary files for python step to read
-        shell: bash
-        env:
-          HTML_CONTENT: ${{ steps.build-html.outputs.html }}
-          PLAIN_BODY: ${{ steps.check.outputs.plain_body }}
-        run: |
-          # create temp files for python step (already supplied via env above)
-          echo "$HTML_CONTENT" > /tmp/status_email.html || true
-          echo "$PLAIN_BODY" > /tmp/status_email.txt || true
