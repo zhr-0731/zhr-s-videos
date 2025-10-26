@@ -1,11 +1,13 @@
 name: repo-access-check-and-notify
 
 # 每两个小时一次，在 UTC 的 07:00 ~ 21:00（07:00,09:00,11:00,13:00,15:00,17:00,19:00,21:00）
-# 若要使用北京时间(UTC+8)请告诉我，我会替你调整 cron
 on:
   schedule:
     - cron: '0 7-21/2 * * *'
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -106,7 +108,8 @@ jobs:
           content_type: text/html
 
       - name: Check mailbox for incoming queries and reply (optional IMAP)
-        if: ${{ secrets.IMAP_SERVER && secrets.IMAP_USERNAME && secrets.IMAP_PASSWORD }}
+        # 不在 step if 使用 secrets（避免校验阶段错误）
+        # 在运行时脚本内判断 IMAP 是否已配置；若未配置则安全退出
         env:
           IMAP_SERVER: ${{ secrets.IMAP_SERVER }}
           IMAP_PORT: ${{ secrets.IMAP_PORT }}
@@ -120,6 +123,12 @@ jobs:
           ALLOWED_SENDERS: ${{ env.ALLOWED_QUERY_SENDERS }}
           QUERY_TEXT: ${{ env.QUERY_MATCH_TEXT }}
         run: |
+          # 如果未配置 IMAP 凭据则直接跳过
+          if [ -z "${IMAP_SERVER}" ] || [ -z "${IMAP_USERNAME}" ] || [ -z "${IMAP_PASSWORD}" ]; then
+            echo "IMAP credentials not provided — skipping mailbox check."
+            exit 0
+          fi
+
           python3 - <<'PY'
           import imaplib, email, os, smtplib, ssl
           from email.message import EmailMessage
