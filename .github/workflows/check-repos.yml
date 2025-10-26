@@ -1,6 +1,7 @@
 name: repo-access-check-and-notify
 
-# 每两个小时一次，UTC 时间 07:00 ~ 21:00（07,09,11,13,15,17,19,21）
+# 每两个小时一次，在 UTC 的 07:00 ~ 21:00（07:00,09:00,11:00,13:00,15:00,17:00,19:00,21:00）
+# 若要使用北京时间(UTC+8)请告诉我，我会替你调整 cron
 on:
   schedule:
     - cron: '0 7-21/2 * * *'
@@ -49,13 +50,12 @@ jobs:
             fi
           done
 
-          # export outputs and write temp files that later steps can read safely
+          # export outputs for later steps and save temp files for IMAP step
           echo "failed=${failed}" >> $GITHUB_OUTPUT
           echo "plain_body<<EOF" >> $GITHUB_OUTPUT
           echo -e "$plain_body" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-          # also save to temp files for IMAP python step to read
           printf "%s" "$plain_body" > /tmp/status_email.txt || true
 
       - name: Build HTML status email
@@ -81,7 +81,7 @@ jobs:
 
           html+="</tbody>\n      </table>\n    </div>\n    <div class=\"footer\">\n      <p style=\"margin:0 0 8px\">摘要：${FAILED} 个异常</p>\n      <pre>${PLAIN}</pre>\n    </div>\n  </div>\n</body>\n</html>"
 
-          # export step output and save HTML to temp file for python step
+          # export step output and save HTML to temp file for IMAP step
           echo "html<<EOF" >> $GITHUB_OUTPUT
           echo -e "$html" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
